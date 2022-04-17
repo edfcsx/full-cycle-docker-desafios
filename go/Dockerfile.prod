@@ -1,0 +1,12 @@
+FROM golang:alpine as go-builder
+
+WORKDIR /usr/src/app
+
+COPY hello-world.go .
+RUN go build -ldflags "-s -w" hello-world.go && \
+    rm hello-world.go
+
+FROM hello-world
+WORKDIR /usr/src/app
+COPY --from=go-builder /usr/src/app/hello-world .
+CMD ["./hello-world"]
