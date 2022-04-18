@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Full Cycle</title>
+</head>
+<style>
+    body {
+        padding: 0;
+        margin: 0;
+    }
+
+    .container {
+        background-color: #d35400;
+        width: 100vw;
+        height: 100vh;
+        display: flex;
+        flex-direction: column;
+        padding: 25px;
+        box-sizing: border-box;
+    }
+
+    h1 {
+        color: #fff;
+    }
+
+    span {
+        color: #fff;
+        font-size: 18px;
+        margin-bottom: 15px;
+    }
+
+    label {
+        color: #fff;
+    }
+
+    button {
+        margin-top: 15px;
+        width: 100px;
+    }
+
+    .user_list_text {
+        margin-top: 25px;
+        color: #fff;
+        font-size: 22px;
+        margin-bottom: 15px;
+    }
+
+    .list-item-option {
+        color: #fff;
+        margin-top: 10px;
+        list-style-type: none;
+        font-size: 18px;
+    }
+</style>
+<body>
+    <div class="container">
+        <h1>Code.education Rocks!</h1>
+
+        <span>Cadastrar usuário</span>
+        <div>
+            <label>Nome:</label>
+            <input name="user" id="user">
+        </div>   
+
+        <button id="register">Cadastrar</button>
+
+        <p class="user_list_text">Lista de usuários</p>
+
+        <div id="user_list"></div>
+    </div>
+</body>
+<script>
+    async function loadUsers () {
+        const result = await fetch('/load-users')
+        const response = await result.json()
+
+        const elementsContainer = document.getElementById('user_list')
+
+        if (!response.data.length) {
+            const notFoundText = document.createElement('span')
+            notFoundText.textContent = "Não existem usuários cadastrados"
+            elementsContainer.append(notFoundText)
+        } else {
+            const listElement = document.createElement('ul')
+            
+            for (const user of response.data) {
+                const listItemElement = document.createElement('li')
+                listItemElement.setAttribute('class', 'list-item-option')
+                listItemElement.innerHTML = user.name
+               
+                listElement.appendChild(listItemElement)
+            }
+
+            elementsContainer.appendChild(listElement)
+        }
+    }
+
+    document.getElementById('register').addEventListener('click', (e) => {
+        this.saveUser(e)
+    })
+
+    async function saveUser(event) {
+        event.preventDefault()
+        const user = document.getElementById('user')
+
+        if (!user.value.length) {
+            alert('Informe um usuário válido')
+        } else {
+            const request = await fetch(`insert?user=${user.value}`)
+            const response = await request.json()
+
+            if (response.error) {
+                alert('Ocorreu um erro ao cadastrar o usuário')
+            } else {
+                alert('Usuário cadastrado com sucesso')
+                window.location.reload()
+            }
+        }
+    }
+
+    loadUsers()
+</script>
+</html>
